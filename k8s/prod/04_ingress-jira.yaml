@@ -1,0 +1,21 @@
+--- # ING JIRA
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ops-jira-ingress
+spec:
+  rules:
+  - host: ops-jira.cencosud.corp
+    http:
+      paths:
+      - backend:
+          serviceName: ops-jira-svc
+          servicePort: 8080
+        path: /
+  - host: ops-jira
+    http:
+      paths:
+      - backend:
+          serviceName: ops-jira-svc
+          servicePort: 8080
+        path: /

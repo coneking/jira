@@ -1,0 +1,53 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: jira
+    area: opops
+    environment: prod
+    version: "7.13.0"
+  name: jira
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jira
+      area: opops
+      environment: prod
+      version: "7.13.0"
+  template:
+    metadata:
+      labels:
+        app: jira
+        area: opops
+        environment: prod
+        version: "7.13.0"
+      name: jira
+    spec:
+      containers:
+        - name: jira
+          image: blacklabelops/jira:7.13.0
+          imagePullPolicy: IfNotPresent
+          resources:
+            limits:
+              cpu: "2"
+              memory: "4G"
+            requests:
+              cpu: "1"
+              memory: "2G"
+          volumeMounts:
+            - name: jira
+              mountPath: /var/atlassian/jira
+            - name: tz-config
+              mountPath: /etc/localtime
+      securityContext:
+        fsGroup: 1000
+        runAsUser: 1000
+      volumes:
+      - name: jira
+        persistentVolumeClaim:
+          claimName: jira-home-pvc
+      - name: tz-config
+        hostPath:
+          path: /usr/share/zoneinfo/America/Santiago
+          type: ""

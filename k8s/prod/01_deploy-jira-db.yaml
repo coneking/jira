@@ -1,0 +1,90 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: postgres
+    area: opops
+    environment: prod
+    version: "10"
+  name: jira-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+      area: opops
+      name: jira-db
+      environment: prod
+      version: "10"
+  template:
+    metadata:
+      labels:
+        app: postgres
+        area: opops
+        name: jira-db
+        environment: prod
+        version: "10"
+    spec:
+      containers:
+      - env:
+        - name: POSTGRES_PASSWORD
+          value: p4ssJ1r42k19
+        - name: POSTGRES_USER
+          value: jira
+        - name: POSTGRES_DB
+          value: jiradb
+        - name: POSTGRES_ENCODING
+          value: UNICODE
+        - name: POSTGRES_COLLATE
+          value: C
+        - name: POSTGRES_COLLATE_TYPE
+          value: C
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        image: postgres:10
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            cpu: 600m
+            memory: 512Mi
+          requests:
+            cpu: 200m
+            memory: 256Mi
+        livenessProbe:
+          exec:
+            command:
+            - pg_isready
+            - -h
+            - localhost
+            - -p
+            - "5432"
+          failureThreshold: 3
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        name: postgresql
+        ports:
+        - containerPort: 5432
+          name: postgres
+          protocol: TCP
+        readinessProbe:
+          exec:
+            command:
+            - pg_isready
+            - -h
+            - localhost
+            - -p
+            - "5432"
+          failureThreshold: 3
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        volumeMounts:
+        - mountPath: /var/lib/postgresql/data
+          name: data
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: jira-db-pvc

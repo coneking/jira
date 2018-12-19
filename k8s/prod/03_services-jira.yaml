@@ -1,0 +1,36 @@
+--- # SVC POSTGRES AND SVC JIRA
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: jira
+  name: ops-jira-svc
+spec:
+  ports:
+    - port: 8080
+      targetPort: 8080
+  selector:
+    app: jira
+    area: opops
+    environment: prod
+    version: "7.13.0"
+  type: LoadBalancer
+
+--- 
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+  name: ops-jira-db-svc
+spec:
+  ports:
+  - name: postgresql
+    port: 5432
+    protocol: TCP
+    targetPort: 5432
+  selector:
+    app: postgres
+    area: opops
+    name: jira-db
+    environment: prod 
+    version: "10"
